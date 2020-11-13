@@ -1,0 +1,11 @@
+2018-01-30
+version number£º
+2.1.11
+update content£º
+1. fix API21 below to get the serial number crash
+2. optimize memory release
+3. increase the output fingerprint quality public int getLastQuality (), get the latest fingerprint image quality
+-------------------------------------
+2017-07-10
+1. update algorithm library, add support for Android 6/7;
+2. update new version 2.1.1\t20170710; (\t is tab symbol, available by FingerprintSensor.getSDK_Version api)

@@ -1,0 +1,98 @@
+s
+which pass a numeric mode and permissions.
+This function is subject to change as there is no easy way
+to get a lower layer to do the open and then regain control.
+
+=item $obj->FILENO($fh)
+
+Returns a numeric value for a Unix-like file descriptor. Returns -1 if
+there isn't one.  Optional.  Default is fileno($fh).
+
+=item $obj->READ($buffer,$len,$fh)
+
+Returns the number of octets placed in $buffer (must be less than or
+equal to $len).  Optional.  Default is to use FILL instead.
+
+=item $obj->WRITE($buffer,$fh)
+
+Returns the number of octets from $buffer that have been successfully written.
+
+=item $obj->FILL($fh)
+
+Should return a string to be placed in the buffer.  Optional. If not
+provided, must provide READ or reject handles open for reading in
+PUSHED.
+
+=item $obj->CLOSE($fh)
+
+Should return 0 on success, -1 on error.
+Optional.
+
+=item $obj->SEEK($posn,$whence,$fh)
+
+Should return 0 on success, -1 on error.
+Optional.  Default is to fail, but that is likely to be changed
+in future.
+
+=item $obj->TELL($fh)
+
+Returns file position.
+Optional.  Default to be determined.
+
+=item $obj->UNREAD($buffer,$fh)
+
+Returns the number of octets from $buffer that have been successfully
+saved to be returned on future FILL/READ calls.  Optional.  Default is
+to push data into a temporary layer above this one.
+
+=item $obj->FLUSH($fh)
+
+Flush any buffered write data.  May possibly be called on readable
+handles too.  Should return 0 on success, -1 on error.
+
+=item $obj->SETLINEBUF($fh)
+
+Optional. No return.
+
+=item $obj->CLEARERR($fh)
+
+Optional. No return.
+
+=item $obj->ERROR($fh)
+
+Optional. Returns error state. Default is no error until a mechanism
+to signal error (die?) is worked out.
+
+=item $obj->EOF($fh)
+
+Optional. Returns end-of-file state. Default is a function of the return
+value of FILL or READ.
+
+=back
+
+=head1 EXAMPLES
+
+Check the PerlIO::via:: namespace on CPAN for examples of PerlIO layers
+implemented in Perl.  To give you an idea how simple the implementation of
+a PerlIO layer can look, a simple example is included here.
+
+=head2 Example - a Hexadecimal Handle
+
+Given the following module, PerlIO::via::Hex :
+
+    package PerlIO::via::Hex;
+
+    sub PUSHED
+    {
+     my ($class,$mode,$fh) = @_;
+     # When writing we buffer the data
+     my $buf = '';
+     return bless \$buf,$class;
+    }
+
+    sub FILL
+    {
+     my ($obj,$fh) = @_;
+     my $line = <$fh>;
+     return (defined $line) ? pack("H*", $line) : undef;
+   
